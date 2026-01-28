@@ -1,4 +1,4 @@
-package com.example.vehicleinventory.presentation.ui.theme
+package com.example.vehicleinventory.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -125,7 +125,7 @@ val Typography = Typography(
     labelSmall = TextStyle(
         fontFamily = satoshi,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
+        fontSize = 10.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
     )

@@ -1,4 +1,4 @@
-package com.example.vehicleinventory.presentation.ui.theme
+package com.example.vehicleinventory.presentation.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -12,7 +12,13 @@ private val LightColorScheme = lightColorScheme(
     outline = BorderColor,
     outlineVariant = ButtonBorder,
     onSurface = TextPrimary,
-    onSurfaceVariant = TextSecondary
+    onSurfaceVariant = TextSecondary,
+    onTertiary = TextSelectionScreen,
+    onTertiaryContainer = TextFieldLabel,
+    inverseOnSurface = TextFieldText,
+    secondaryContainer = TotalVehiclesCard,
+    tertiaryContainer = TotalEVCard,
+    surfaceContainer = TableHeaderColor
 
 
     /* Other default colors to override
