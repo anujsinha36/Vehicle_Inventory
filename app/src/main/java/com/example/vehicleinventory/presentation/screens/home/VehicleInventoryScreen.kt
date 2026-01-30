@@ -1,5 +1,8 @@
 package com.example.vehicleinventory.presentation.screens.home
 
+
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -8,33 +11,82 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.vehicleinventory.presentation.VehicleViewModel
+import com.example.vehicleinventory.FilterScreen
+import com.example.vehicleinventory.FilterOption
+import com.example.vehicleinventory.FilterSection
+import com.example.vehicleinventory.data.local.Vehicle
+import com.example.vehicleinventory.domain.util.VehicleData
+import com.example.vehicleinventory.presentation.viewmodels.VehicleViewModel
 import com.example.vehicleinventory.presentation.designsystem.buttons.PrimaryButton
 import com.example.vehicleinventory.presentation.theme.VehicleInventoryTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 // Data classes
-data class Vehicle(
-    val modelAndBrand: String,
-    val vehicleNumber: String,
-    val fuelType: String,
-    val yearOfPurchase: String,
-    val duration: String
-)
+//data class Vehicle(
+//    val modelAndBrand: String,
+//    val vehicleNumber: String,
+//    val fuelType: String,
+//    val yearOfPurchase: String,
+//    val duration: String
+//)
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun VehicleInventoryScreen(
     userName: String = "Amin",
-    modifier: Modifier,
-    totalVehicles: Int = 2300,
-    totalEV: Int = 2300,
-    vehicles: List<Vehicle> = getSampleVehicles(),
+//    vehicles: List<Vehicle>,
     onAddVehicleClick: () -> Unit = {},
-    onFilterClick: () -> Unit = {},
-  //  viewModel: VehicleViewModel = hiltViewModel()
+    viewModel: VehicleViewModel = hiltViewModel()
 ) {
+
+
+    val state = viewModel.uiState.collectAsState()
+    val vehicles: List<Vehicle> = state.value.vehicles
+    val systemUiController = rememberSystemUiController()
+
+    DisposableEffect(systemUiController) {
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent,
+            darkIcons = false
+        )
+        onDispose {}
+    }
+
+    var showFilterDialog by remember { mutableStateOf(false) }
+
+    var filterSections by remember {
+        mutableStateOf(
+            listOf(
+                FilterSection("Brand", VehicleData.brands.map { FilterOption(it, false) }),
+                FilterSection("Fuel Type", VehicleData.fuelTypes.map { FilterOption(it, false) })
+            )
+        )
+    }
+
+    val filteredVehicles = remember(vehicles, filterSections) {
+        val selectedBrands = filterSections.find { it.title == "Brand" }
+            ?.options?.filter { it.isSelected }?.map { it.label }?.toSet()
+        val selectedFuelTypes = filterSections.find { it.title == "Fuel Type" }
+            ?.options?.filter { it.isSelected }?.map { it.label }?.toSet()
+
+        if (selectedBrands.isNullOrEmpty() && selectedFuelTypes.isNullOrEmpty()) {
+            vehicles
+        } else {
+            vehicles.filter { vehicle ->
+                val brand = vehicle.brand
+                val fuelType = vehicle.fuelType
+
+                val brandMatch = selectedBrands.isNullOrEmpty() || (brand != null && brand in selectedBrands)
+                val fuelTypeMatch = selectedFuelTypes.isNullOrEmpty() || (fuelType in selectedFuelTypes)
+
+                brandMatch && fuelTypeMatch
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -44,89 +96,71 @@ fun VehicleInventoryScreen(
         // Fixed Top Section
         TopSection(
             userName = userName,
-            totalVehicles = totalVehicles,
-            totalEV = totalEV
+            totalVehicles = state.value.totalVehicles,
+            totalEV = state.value.totalEVs
         )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         Box(modifier = Modifier.fillMaxSize()) {
             VehicleInventoryList(
-                vehicles = vehicles,
-                onFilterClick = onFilterClick
+                vehicles = filteredVehicles,
+                onFilterClick = {showFilterDialog = true}
             )
-            PrimaryButton(
-                modifier = Modifier.align(Alignment.BottomEnd)
-                    .padding(vertical = 22.dp, horizontal = 3.dp),
-                text = "Add Vehicle",
-                onClick = onAddVehicleClick,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = "TODO()"
 
-                    )
-                }
-            )
+                PrimaryButton(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(vertical = 30.dp, horizontal = 16.dp)
+                        .height(52.dp),
+                    text = "Add Vehicle",
+                    onClick = onAddVehicleClick,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "TODO()"
+
+                        )
+                    }
+                )
+//            SecondaryButton(
+//                text = "Delete data",
+//                onClick = {viewModel.deleteAllVehicles()}
+//            )
+
+
         }
-        // Scrollable Bottom Section
 
-
+    }
+    if (showFilterDialog) {
+        FilterScreen(
+            filterSections = filterSections,
+            onFilterChange = { sectionIndex, optionIndex, isSelected ->
+                val newFilterSections = filterSections.toMutableList()
+                val section = newFilterSections[sectionIndex]
+                val newOptions = section.options.toMutableList()
+                newOptions[optionIndex] = newOptions[optionIndex].copy(isSelected = isSelected)
+                newFilterSections[sectionIndex] = section.copy(options = newOptions)
+                filterSections = newFilterSections
+            },
+            onApply = {
+                showFilterDialog = false
+            },
+            onClearAll = {
+                filterSections = filterSections.map { section ->
+                    section.copy(options = section.options.map { it.copy(isSelected = false) })
+                }
+            },
+            onDismiss = { showFilterDialog = false }
+        )
     }
 }
 
-// Sample data function
-fun getSampleVehicles(): List<Vehicle> {
-    return listOf(
-        Vehicle(
-            modelAndBrand = "Activa 4G\nHonda",
-            vehicleNumber = "KA 01 AA 0027",
-            fuelType = "Petrol",
-            yearOfPurchase = "2018",
-            duration = "7 years 0 months"
-        ),
-        Vehicle(
-            modelAndBrand = "Nexon XM\nTata",
-            vehicleNumber = "KA 10 AM 2523",
-            fuelType = "Petrol",
-            yearOfPurchase = "2021",
-            duration = "5 years 1 month"
-        ),
-        Vehicle(
-            modelAndBrand = "Activa 125\nHonda",
-            vehicleNumber = "DL 8 CAF 9876",
-            fuelType = "Petrol",
-            yearOfPurchase = "2020",
-            duration = "5 years 4 months"
-        ),
-        Vehicle(
-            modelAndBrand = "Activa 125\nHonda",
-            vehicleNumber = "DL 8 CAF 9876",
-            fuelType = "Petrol",
-            yearOfPurchase = "2020",
-            duration = "4 years 3 months"
-        ),
-        Vehicle(
-            modelAndBrand = "City VX\nHonda",
-            vehicleNumber = "TN 22 CZ 3344",
-            fuelType = "Petrol",
-            yearOfPurchase = "2022",
-            duration = "3 years 2 months"
-        ),
-        Vehicle(
-            modelAndBrand = "Pulsar 150\nBajaj",
-            vehicleNumber = "UP 32 KT 1098",
-            fuelType = "Petrol",
-            yearOfPurchase = "2019",
-            duration = "6 years 5 months"
-        )
-    )
-}
 
 @Preview
 @Composable
 fun PreviewInventoryScreen(){
     VehicleInventoryTheme {
-        VehicleInventoryScreen(modifier = Modifier)
+//        VehicleInventoryScreen()
     }
 }

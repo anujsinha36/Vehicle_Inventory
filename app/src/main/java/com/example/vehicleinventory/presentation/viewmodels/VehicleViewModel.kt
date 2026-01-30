@@ -1,9 +1,11 @@
-package com.example.vehicleinventory.presentation
+package com.example.vehicleinventory.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vehicleinventory.data.local.Vehicle
 import com.example.vehicleinventory.domain.usecase.AddVehicleUseCase
+import com.example.vehicleinventory.domain.usecase.DeleteAllVehicleUseCase
 import com.example.vehicleinventory.domain.usecase.GetElectricVehicleCountUseCase
 import com.example.vehicleinventory.domain.usecase.GetTotalVehicleCountUseCase
 import com.example.vehicleinventory.domain.usecase.GetVehiclesUseCase
@@ -19,7 +21,8 @@ class VehicleViewModel @Inject constructor(
     private val addVehicleUseCase: AddVehicleUseCase,
     getVehiclesUseCase: GetVehiclesUseCase,
     getTotalVehicleCountUseCase: GetTotalVehicleCountUseCase,
-    getElectricVehicleCountUseCase: GetElectricVehicleCountUseCase
+    getElectricVehicleCountUseCase: GetElectricVehicleCountUseCase,
+    private val deleteAllVehicleUseCase: DeleteAllVehicleUseCase
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(VehicleInventoryState())
@@ -41,6 +44,7 @@ class VehicleViewModel @Inject constructor(
                     isLoading = false
                 )
             }.collect { newState ->
+                Log.d("VehicleViewModel", "Received state: total=${newState.totalVehicles}, ev=${newState.totalEVs}, vehiclesListSize=${newState.vehicles.size}")
                 _uiState.value = newState
             }
         }
@@ -48,7 +52,15 @@ class VehicleViewModel @Inject constructor(
 
     fun addVehicle(vehicle: Vehicle){
         viewModelScope.launch {
+            Log.d("VehicleViewModel", "Adding vehicle: $vehicle")
             addVehicleUseCase(vehicle)
+        }
+    }
+
+    fun deleteAllVehicles() {
+        viewModelScope.launch {
+            Log.d("VehicleViewModel", "Deleting all vehicles")
+            deleteAllVehicleUseCase()
         }
     }
 

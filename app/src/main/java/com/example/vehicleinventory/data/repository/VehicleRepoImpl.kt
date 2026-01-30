@@ -1,5 +1,7 @@
-package com.example.vehicleinventory.data.local
+package com.example.vehicleinventory.data.repository
 
+import com.example.vehicleinventory.data.local.Vehicle
+import com.example.vehicleinventory.data.local.VehicleDao
 import com.example.vehicleinventory.domain.Repository.VehicleRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -23,4 +25,6 @@ class VehicleRepoImpl @Inject constructor(
     override fun getElectricVehicleCount(): Flow<Int> {
         return vehicleDao.getElectricVehicleCount()
     }
+    override suspend fun deleteAllVehicle() {
+        vehicleDao.deleteAllVehicle()}
 }

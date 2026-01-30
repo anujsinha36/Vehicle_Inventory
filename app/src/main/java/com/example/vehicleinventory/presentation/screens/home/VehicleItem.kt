@@ -1,5 +1,7 @@
 package com.example.vehicleinventory.presentation.screens.home
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,8 +22,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.vehicleinventory.data.local.Vehicle
+import com.example.vehicleinventory.domain.util.getVehicleAge
 import com.example.vehicleinventory.presentation.theme.VehicleInventoryTheme
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun VehicleItem(vehicle: Vehicle) {
     Column {
@@ -42,17 +47,17 @@ fun VehicleItem(vehicle: Vehicle) {
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = vehicle.modelAndBrand.substringBefore('\n'),
+                    text = vehicle.model,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                if (vehicle.modelAndBrand.contains('\n')) {
+
                     Text(
-                        text = vehicle.modelAndBrand.substringAfter('\n'),
+                        text = vehicle.brand,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
+
             }
 
             // Vertical Divider 1
@@ -102,12 +107,12 @@ fun VehicleItem(vehicle: Vehicle) {
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
-                    text = vehicle.yearOfPurchase,
+                    text = "${vehicle.yearOfPurchase}",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = vehicle.duration,
+                    text = getVehicleAge(vehicle.yearOfPurchase),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -121,6 +126,7 @@ fun VehicleItem(vehicle: Vehicle) {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview
 @Composable
 fun PreviewVehicleItem(){
@@ -128,11 +134,12 @@ fun PreviewVehicleItem(){
         VehicleItem(
             vehicle =
                 Vehicle(
-                    modelAndBrand = "Activa 4G\nHonda",
+                    brand = "Activa 4G",
+                    model = "Honda",
                     vehicleNumber = "KA 01 AA 0027",
                     fuelType = "Petrol",
-                    yearOfPurchase = "2018",
-                    duration = "7 years 6 months"
+                    yearOfPurchase = "2018".toInt(),
+                    ownerName = "7 years 6 months"
                 )
         )
     }

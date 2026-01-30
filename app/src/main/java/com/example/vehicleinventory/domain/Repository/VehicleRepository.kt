@@ -12,4 +12,6 @@ interface VehicleRepository {
     fun getTotalVehicleCount(): Flow<Int>
 
     fun getElectricVehicleCount(): Flow<Int>
+
+    suspend fun deleteAllVehicle()
 }

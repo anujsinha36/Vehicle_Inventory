@@ -28,13 +28,13 @@ fun PrimaryButton(
 ){
     Button(
         onClick = onClick,
-        modifier = modifier.height(52.dp),
+        modifier = modifier,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
         ),
         shape = RoundedCornerShape(12.dp),
-        contentPadding = ButtonDefaults.ContentPadding
+//        contentPadding = ButtonDefaults.ContentPadding
 
     ) {
         Row(

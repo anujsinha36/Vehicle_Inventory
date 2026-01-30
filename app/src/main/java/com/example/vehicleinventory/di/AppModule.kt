@@ -1,10 +1,11 @@
 package com.example.vehicleinventory.di
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import com.example.vehicleinventory.data.local.VehicleDao
 import com.example.vehicleinventory.data.local.VehicleDatabase
-import com.example.vehicleinventory.data.local.VehicleRepoImpl
+import com.example.vehicleinventory.data.repository.VehicleRepoImpl
 import com.example.vehicleinventory.domain.Repository.VehicleRepository
 import com.example.vehicleinventory.domain.usecase.AddVehicleUseCase
 import com.example.vehicleinventory.domain.usecase.GetElectricVehicleCountUseCase
@@ -27,11 +28,21 @@ object AppModule {
     fun provideDatabase(
         @ApplicationContext appContext: Context
     ): VehicleDatabase {
-        return Room.databaseBuilder(
+        val db = Room.databaseBuilder(
             appContext,
             VehicleDatabase::class.java,
             "vehicle_database"
         ).build()
+
+        // Log the expected DB file path so you can inspect it on the device/emulator
+        try {
+            val path = appContext.getDatabasePath("vehicle_database").absolutePath
+            Log.d("AppModule", "Vehicle DB path: $path")
+        } catch (e: Exception) {
+            Log.w("AppModule", "Failed to resolve DB path: ${e.message}")
+        }
+
+        return db
     }
 
     @Provides
@@ -59,4 +70,3 @@ object AppModule {
     fun provideGetElectricVehicleCountUseCase(repository: VehicleRepository): GetElectricVehicleCountUseCase =
         GetElectricVehicleCountUseCase(repository)
 }
-

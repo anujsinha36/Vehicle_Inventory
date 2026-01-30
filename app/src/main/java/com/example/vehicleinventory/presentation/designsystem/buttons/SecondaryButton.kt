@@ -17,17 +17,18 @@ import com.example.vehicleinventory.presentation.theme.VehicleInventoryTheme
 @Composable
 fun SecondaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ){
     Button(
         onClick = onClick,
-        modifier = Modifier.height(44.dp),
+        modifier = modifier,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         shape = RoundedCornerShape(12.dp),
-        contentPadding = PaddingValues(horizontal = 60.dp, vertical = 10.dp)
+//        contentPadding = PaddingValues(horizontal = 60.dp, vertical = 10.dp)
 
     ) {
         Text(

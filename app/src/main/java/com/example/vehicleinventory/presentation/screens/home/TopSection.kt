@@ -43,7 +43,7 @@ fun TopSection(
                     )
                 )
             ) // Used brush gradient as ellipses were not working
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(top = 40.dp, bottom = 24.dp, start = 15.dp, end = 15.dp)
     ) {
             // Greeting Section
             Row(
@@ -79,7 +79,7 @@ fun TopSection(
 
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(35.dp))
 
             // Statistics Cards Row
             Row(

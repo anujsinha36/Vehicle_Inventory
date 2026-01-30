@@ -1,5 +1,6 @@
 package com.example.vehicleinventory.presentation.screens.addvehicle
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,19 +32,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.vehicleinventory.data.local.Vehicle
 import com.example.vehicleinventory.domain.util.VehicleData
 import com.example.vehicleinventory.domain.util.getIconForOption
+import com.example.vehicleinventory.presentation.viewmodels.VehicleViewModel
 import com.example.vehicleinventory.presentation.designsystem.buttons.PrimaryButton
 import com.example.vehicleinventory.presentation.designsystem.selections.SelectionSheet
 import com.example.vehicleinventory.presentation.designsystem.textfields.DropdownTextField
 import com.example.vehicleinventory.presentation.designsystem.textfields.InputTextField
 import com.example.vehicleinventory.presentation.theme.VehicleInventoryTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddVehicleScreen(
     onBackClick: () -> Unit = {},
-    onAddVehicle: () -> Unit = {}
+    onAddVehicle: () -> Unit = {},
+    viewModel: VehicleViewModel = hiltViewModel()
 ) {
     var showBrandSelection by remember { mutableStateOf(false) }
     var showModelSelection by remember { mutableStateOf(false) }
@@ -53,6 +60,20 @@ fun AddVehicleScreen(
     var vehicleNumber by remember { mutableStateOf("") }
     var selectedYear by remember { mutableStateOf("") }
     var ownerName by remember { mutableStateOf("") }
+
+    val systemUiController = rememberSystemUiController()
+
+    // Use DisposableEffect to set the system bar icons color when the screen is active
+    DisposableEffect(systemUiController) {
+        // Set the status bar icons to be light
+        systemUiController.setSystemBarsColor(
+            color = Color.Transparent, // Make the status bar background transparent
+            darkIcons = true // This is the crucial part: false means light icons (white)
+        )
+        onDispose {}
+    }
+
+
 
     Scaffold(
         topBar = {
@@ -202,7 +223,7 @@ fun AddVehicleScreen(
                     label = "Year of Purchase",
                     placeholder = "Select year of purchase",
                     value = selectedYear,
-                    onValueChange = {selectedYear = it}
+                    onValueChange = { selectedYear = it.filter { ch -> ch.isDigit() } }
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -226,8 +247,26 @@ fun AddVehicleScreen(
             ) {
                 PrimaryButton(
                     text = "Add Vehicle",
-                    onClick = onAddVehicle,
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = {
+                        // Safely parse year: remove any non-digit characters (e.g. accidental leading space)
+                        val year = selectedYear.filter { it.isDigit() }.toIntOrNull() ?: 0
+
+                        // Debug log to inspect the raw and parsed values
+                        Log.d("AddVehicleScreen", "selectedYear='${selectedYear}', parsedYear=$year")
+
+                        val vehicleData = Vehicle(
+                            brand = selectedBrand,
+                            model = selectedModel,
+                            fuelType = selectedFuelType,
+                            vehicleNumber = vehicleNumber,
+                            yearOfPurchase = year,
+                            ownerName = ownerName,
+                        )
+                        viewModel.addVehicle(vehicleData)
+                        onAddVehicle()
+                              }
+                    ,
+                    modifier = Modifier.fillMaxWidth().height(52.dp)
                 )
             }
         }
