@@ -42,7 +42,6 @@ The app allows users to add vehicles, manage inventory, view vehicle statistics,
 ## Future Enhancements
 
 - Edit existing vehicle details
-- Search vehicles by number or model
 - Vehicle image support
 - Dark mode support
 - Cloud sync & backup
