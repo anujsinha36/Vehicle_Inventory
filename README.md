@@ -29,15 +29,15 @@ The app allows users to add vehicles, manage inventory, view vehicle statistics,
 
 | Dashboard | Add Vehicle |
 |---|---|
-| ![Dashboard](dashboard.png) | ![Add Vehicle](screenshots/add_vehicle.png) |
+| ![Dashboard](dashboard.png) | ![Add Vehicle](add_vehicle.png) |
 
 | Filter | Brand Selection |
 |---|---|
-| ![Filter](screenshots/filter.png) | ![Brand](screenshots/brand_selection.png) |
+| ![Filter](filter.png) | ![Brand](brand_selection.png) |
 
 | Model Selection | Fuel Type |
 |---|---|
-| ![Model](screenshots/model_selection.png) | ![Fuel](screenshots/fuel_selection.png) |
+| ![Model](model_selection.png) | ![Fuel](fuel_selection.png) |
 
 ## Future Enhancements
 
