@@ -29,7 +29,7 @@ The app allows users to add vehicles, manage inventory, view vehicle statistics,
 
 | Dashboard | Add Vehicle |
 |---|---|
-| ![Dashboard](screenshots/dashboard.png) | ![Add Vehicle](screenshots/add_vehicle.png) |
+| ![Dashboard](dashboard.png) | ![Add Vehicle](screenshots/add_vehicle.png) |
 
 | Filter | Brand Selection |
 |---|---|
